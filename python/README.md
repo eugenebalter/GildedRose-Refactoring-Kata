@@ -49,8 +49,17 @@ python -m unittest discover -s tests -p test_gilded_rose.py -v
 
 Unit tests describe existing rules and boundaries. The approval test compares a
 30-day simulation, including day zero, with the reviewed text file under
-`tests/approved_files`. This baseline captures original behavior: Conjured items
-still degrade like ordinary items. The new Conjured behavior is not implemented.
+`tests/approved_files`. The baseline includes Conjured items under the new rules.
+
+Conjured items lose 2 quality per day before their sell-by date and 4 when
+`sell_in <= 0` at the start of the update. Quality stops at zero; `sell_in`
+decreases by one even when quality is already zero.
+
+Assumption: names beginning with the case-sensitive prefix `Conjured ` (including
+the space) identify this category. This supports different conjured products;
+names such as `ConjuredMana Cake` and `conjured Mana Cake` remain ordinary items.
+No combined special-item rules are introduced for names such as `Conjured Aged Brie`;
+they follow the Conjured rule. Existing categories retain their behavior.
 
 If an approval test fails, compare the `.received.txt` and `.approved.txt` files.
 Update the baseline only for an intentional, reviewed behavior change.

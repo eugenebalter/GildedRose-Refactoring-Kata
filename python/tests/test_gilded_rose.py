@@ -5,6 +5,35 @@ from gilded_rose import Item, GildedRose
 
 
 class GildedRoseTest(unittest.TestCase):
+    def test_conjured_items_lose_two_quality_before_sell_by_date(self):
+        for name in ["Conjured Mana Cake", "Conjured Elixir"]:
+            with self.subTest(name=name):
+                self.assert_daily_update(name, 1, 10, 8)
+
+    def test_conjured_items_lose_four_quality_at_and_after_sell_by_date(self):
+        for sell_in in [0, -1]:
+            with self.subTest(sell_in=sell_in):
+                self.assert_daily_update("Conjured Mana Cake", sell_in, 10, 6)
+
+    def test_conjured_quality_stops_at_zero(self):
+        cases = [(1, 0), (1, 1), (1, 2), (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (-1, 3)]
+        for sell_in, quality in cases:
+            with self.subTest(sell_in=sell_in, quality=quality):
+                self.assert_daily_update("Conjured Mana Cake", sell_in, quality, 0)
+
+    def test_conjured_item_crosses_sell_by_date_over_multiple_days(self):
+        item = Item("Conjured Mana Cake", 1, 9)
+        shop = GildedRose([item])
+        for expected in [(0, 7), (-1, 3), (-2, 0), (-3, 0)]:
+            with self.subTest(expected=expected):
+                shop.update_quality()
+                self.assertEqual(expected, (item.sell_in, item.quality))
+
+    def test_conjured_prefix_is_case_sensitive_and_requires_a_space(self):
+        for name in ["conjured Mana Cake", "ConjuredMana Cake", "Elixir Conjured", "Conjured"]:
+            with self.subTest(name=name):
+                self.assert_daily_update(name, 1, 10, 9)
+
     def assert_daily_update(self, name, sell_in, quality, expected_quality):
         item = Item(name, sell_in, quality)
 

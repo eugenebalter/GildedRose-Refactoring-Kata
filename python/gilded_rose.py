@@ -23,8 +23,10 @@ class GildedRose(object):
                 if item.sell_in <= 0:
                     item.quality = 0
             else:
-                self._decrease_quality(item)
+                degradation = 2 if item.name.startswith("Conjured ") else 1
                 if item.sell_in <= 0:
+                    degradation *= 2
+                for _ in range(degradation):
                     self._decrease_quality(item)
 
             item.sell_in -= 1
