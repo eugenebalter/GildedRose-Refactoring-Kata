@@ -3,12 +3,11 @@ name = "gildedrose-refactoring-kata"
 version = "0.1.0"
 description = "Gilded Rose Refactoring Kata – Blend360 Assignment"
 requires-python = ">=3.10"
-dependencies = [
-    "coverage>=7.13.0",
-]
+dependencies = []
 
 [dependency-groups]
 test = [
+    "coverage>=7.13.0",
     "approvaltests>=16.2.1",
     "pytest>=9.0.2",
     "pytest-approvaltests>=0.2.4",
