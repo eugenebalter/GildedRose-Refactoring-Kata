@@ -5,6 +5,43 @@ from gilded_rose import Item, GildedRose
 
 
 class GildedRoseTest(unittest.TestCase):
+    def test_invalid_numeric_types_are_rejected_before_any_item_is_updated(self):
+        for field in ["sell_in", "quality"]:
+            for value in [1.5, 1.0, "1", None, True, False]:
+                with self.subTest(field=field, value=value):
+                    valid = Item("Aged Brie", 2, 10)
+                    invalid = Item("Conjured Mana Cake", 2, 10)
+                    setattr(invalid, field, value)
+                    before = [vars(item).copy() for item in [valid, invalid]]
+
+                    with self.assertRaises(TypeError) as error:
+                        GildedRose([valid, invalid]).update_quality()
+
+                    self.assertIn(invalid.name, str(error.exception))
+                    self.assertIn(field, str(error.exception))
+                    self.assertIn(repr(value), str(error.exception))
+                    self.assertIn("integer", str(error.exception))
+                    self.assertEqual(before, [vars(valid), vars(invalid)])
+
+    def test_invalid_quality_is_rejected_before_any_item_is_updated(self):
+        names = ["ordinary", "Aged Brie", "Backstage passes to a TAFKAL80ETC concert", "Conjured Mana Cake"]
+        cases = [(name, quality) for name in names for quality in [-1, 51]]
+        cases += [("Sulfuras, Hand of Ragnaros", quality) for quality in [0, 50, 79, 81]]
+        for name, quality in cases:
+            with self.subTest(name=name, quality=quality):
+                valid = Item("Aged Brie", 2, 10)
+                invalid = Item(name, -1, quality)
+                before = [vars(item).copy() for item in [valid, invalid]]
+
+                with self.assertRaises(ValueError) as error:
+                    GildedRose([valid, invalid]).update_quality()
+
+                self.assertIn(name, str(error.exception))
+                self.assertIn("quality", str(error.exception))
+                self.assertIn(str(quality), str(error.exception))
+                self.assertIn("80" if name.startswith("Sulfuras") else "0..50", str(error.exception))
+                self.assertEqual(before, [vars(valid), vars(invalid)])
+
     def test_conjured_items_lose_two_quality_before_sell_by_date(self):
         for name in ["Conjured Mana Cake", "Conjured Elixir"]:
             with self.subTest(name=name):

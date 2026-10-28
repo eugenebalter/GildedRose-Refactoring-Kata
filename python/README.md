@@ -61,6 +61,14 @@ names such as `ConjuredMana Cake` and `conjured Mana Cake` remain ordinary items
 No combined special-item rules are introduced for names such as `Conjured Aged Brie`;
 they follow the Conjured rule. Existing categories retain their behavior.
 
+Additional input contract (not specified by the original kata): `sell_in` and
+`quality` must be Python integers, excluding booleans; negative `sell_in` is valid.
+Quality must be in 0..50, except for Sulfuras, whose quality must be exactly 80.
+`update_quality()` validates the entire item list before changing any item.
+Invalid types raise `TypeError`; invalid quality values raise `ValueError`, with
+the item name, field, value and expected constraint. Invalid data is never rounded
+or corrected, and a validation failure leaves all items unchanged.
+
 If an approval test fails, compare the `.received.txt` and `.approved.txt` files.
 Update the baseline only for an intentional, reviewed behavior change.
 

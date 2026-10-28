@@ -7,6 +7,9 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
+            self._validate_item(item)
+
+        for item in self.items:
             if item.name == "Sulfuras, Hand of Ragnaros":
                 continue
 
@@ -30,6 +33,18 @@ class GildedRose(object):
                     self._decrease_quality(item)
 
             item.sell_in -= 1
+
+    @staticmethod
+    def _validate_item(item):
+        for field in ("sell_in", "quality"):
+            value = getattr(item, field)
+            if type(value) is not int:
+                raise TypeError(f"{item.name!r}: {field} must be an integer, got {value!r}")
+        if item.name == "Sulfuras, Hand of Ragnaros":
+            if item.quality != 80:
+                raise ValueError(f"{item.name!r}: quality must be 80, got {item.quality}")
+        elif not 0 <= item.quality <= 50:
+            raise ValueError(f"{item.name!r}: quality must be in 0..50, got {item.quality}")
 
     @staticmethod
     def _increase_quality(item):
